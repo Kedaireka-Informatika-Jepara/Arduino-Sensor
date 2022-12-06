@@ -35,7 +35,7 @@ void setup()
 void loop()
 {
     static unsigned long timepoint = millis();
-    if(millis()-timepoint>1000U){                  //time interval: 1s
+    if(millis()-timepoint>10000U){                  //time interval: 1s
         timepoint = millis();
         //temperature = readTemperature();         // read your temperature sensor to execute temperature compensation
         voltage = analogRead(PH_PIN)/1024.0*5000;  // read the voltage
