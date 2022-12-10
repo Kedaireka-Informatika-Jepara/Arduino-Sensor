@@ -1,29 +1,10 @@
-#include <Ethernet.h>
-
+#include <ESP8266WiFi.h>
+#include <WiFiClient.h> 
+#include <ESP8266WebServer.h>
+#include <ESP8266HTTPClient.h>
 #include <DFRobot_PH.h>
-
-/*
- * file DFRobot_PH.ino
- * @ https://github.com/DFRobot/DFRobot_PH
- *
- * This is the sample code for Gravity: Analog pH Sensor / Meter Kit V2, SKU:SEN0161-V2
- * In order to guarantee precision, a temperature sensor such as DS18B20 is needed, to execute automatic temperature compensation.
- * You can send commands in the serial monitor to execute the calibration.
- * Serial Commands:
- *   enterph -> enter the calibration mode
- *   calph   -> calibrate with the standard buffer solution, two buffer solutions(4.0 and 7.0) will be automaticlly recognized
- *   exitph  -> save the calibrated parameters and exit from calibration mode
- *
- * Copyright   [DFRobot](http://www.dfrobot.com), 2018
- * Copyright   GNU Lesser General Public License
- *
- * version  V1.0
- * date  2018-04
- */
 #include <OneWire.h>
 #include <DallasTemperature.h>
-
-// 数据输出脚接开发板数字引脚2
 #define ONE_WIRE_BUS 2
 
 OneWire oneWire(ONE_WIRE_BUS);
@@ -32,72 +13,89 @@ DallasTemperature sensors(&oneWire);
 #include <EEPROM.h>
 
 #define PH_PIN A1
-float voltage,phValue,temperature;
+#define TURBIDITY_PIN A0
+float voltage, phValue, temperature, turbidity;
 float suhu;
 DFRobot_PH ph;
+/* Set these to your desired credentials. */
+const char *ssid = "sya";
+const char *password = "sugawara";
 
-void setup()
-{
-    Serial.begin(115200);  
-    ph.begin();
-    sensors.begin();
+//Web/Server address to read/write from 
+const char *host = "testmonitoring.cemebsa.com";
+WiFiClient client;
+void setup() {
+  delay(1000);
+  Serial.begin(115200);
+  ph.begin();
+  sensors.begin();
+  WiFi.mode(WIFI_OFF);            //Prevents reconnection issue (taking too long to connect)
+  delay(1000);
+  WiFi.mode(WIFI_STA);            //This line hides the viewing of ESP as wifi hotspot
+  
+  WiFi.begin(ssid, password);     //Connect to your WiFi router
+  Serial.println("");
+
+  Serial.print("Connecting");
+  // Wait for connection
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  //If connection successful show IP address in serial monitor
+  Serial.println("");
+  Serial.print("Connected to ");
+  Serial.println(ssid);
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());  //IP address assigned to your ESP
 }
 
-void loop()
-{
-    static unsigned long timepoint = millis();
-    if(millis()-timepoint>1000U){                  //time interval: 1s
-        timepoint = millis();
-        //temperature = readTemperature();         // read your temperature sensor to execute temperature compensation
-        voltage = analogRead(PH_PIN)/1024.0*5000;  // read the voltage
-        phValue = ph.readPH(voltage,temperature);  // convert voltage to pH with temperature compensation
-        readTemperature();  
-        readTurbidity();
-        // Serial.print("temperature:");
-        // Serial.print(temperature,1);
-        Serial.print(" pH: ");
-        Serial.println(phValue,2);
-        // SendtoDB();
-    }
-    ph.calibration(voltage,temperature);           // calibration process by Serail CMD
+void loop() {
+  
+  readTemperature();
+  readTurbidity();
+  readpH();
+  
+  SendtoDB();
+
+  ph.calibration(voltage, temperature);  // calibration process by Serail CMD
+  delay(10000);
 }
-float readTurbidity(){
-  int sensorValue = analogRead(A0);// read the input on analog pin 0:
-  float voltage = sensorValue * (5.0 / 1024.0); // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V):
+float readpH(){
+  voltage = analogRead(PH_PIN) / 1024.0 * 5000;  // read the voltage
+  phValue = ph.readPH(voltage, temperature);     // convert voltage to pH with temperature compensation
+  Serial.print(" pH: ");
+  Serial.println(phValue, 2);
+}
+float readTurbidity() {
+  int sensorValue = analogRead(TURBIDITY_PIN);                // read the input on analog pin 0:
+  float turbidity = sensorValue * (5.0 / 1024.0);  // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V):
   Serial.print(" Turbidity: ");
-  Serial.print(voltage); // print out the value you read:
+  Serial.print(turbidity);  // print out the value you read:
 }
-float readTemperature()
-{
+float readTemperature() {
   //add your code here to get the temperature from your temperature sensor
-  sensors.requestTemperatures(); // 发送命令获取温度
+  sensors.requestTemperatures();  // 发送命令获取温度
   Serial.print("Temperature: ");
-  suhu = sensors.getTempCByIndex(0); // 获取温度
-  Serial.print(suhu); 
+  suhu = sensors.getTempCByIndex(0);  // 获取温度
+  Serial.print(suhu);
 }
-// void SendtoDB(){
-//    if (client.connect(server, 80)) {
-//     Serial.println("");
-//     Serial.println("connected");
-//     // Make a HTTP request:
-//     Serial.print("GET /monitoring/masukdb/koneksi.php?temperature=");
-//     Serial.print(suhu);
-//     Serial.print("&ph=");
-//     Serial.println(phValue);
-//     Serial.println("");
-    
-//     client.print("GET /arduino_mysql/koneksi.php?temperature=");     //YOUR URL
-//     client.print(suhu);
-//     client.print("&ph=");
-//     client.print(phValue);
-//     client.print(" ");      //SPACE BEFORE HTTP/1.1
-//     client.print("HTTP/1.1");
-//     client.println();
-//     client.println("Host: 192.168.10.5");
-//     client.println("Connection: close");
-//     client.println();
-//   } else {
-//     // if you didn't get a connection to the server:
-//     Serial.println("connection failed");
-//   }
-//  }
+void SendtoDB() {
+  //Post Data
+  postData = "suhu=" + suhu + "&ph=" + phValue + "&turbidity=" + turbidity;
+
+  http.begin(client, "http://testmonitoring.cemebsa.com/test/koneksi.php");  //Specify request destination
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");       //Specify content-type header
+
+  int httpCode = http.POST(postData);  //Send the request
+  String payload = http.getString();   //Get the response payload
+
+  Serial.println(postData);
+  Serial.println(httpCode);  //Print HTTP return code
+  Serial.println(payload);   //Print request response payload
+
+  http.end();  //Close connection
+
+  
+}
