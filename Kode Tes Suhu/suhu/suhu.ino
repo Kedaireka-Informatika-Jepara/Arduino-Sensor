@@ -1,8 +1,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-// 数据输出脚接开发板数字引脚2
-#define ONE_WIRE_BUS 2
+#define ONE_WIRE_BUS D5
 
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
