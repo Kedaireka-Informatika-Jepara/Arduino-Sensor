@@ -48,6 +48,26 @@ void setup() {
   // ph.begin();
   sensors.begin();
   Serial.begin(115200);
+  WiFi.mode(WIFI_OFF);            //Prevents reconnection issue (taking too long to connect)
+  delay(1000);
+  WiFi.mode(WIFI_STA);            //This line hides the viewing of ESP as wifi hotspot
+  
+  WiFi.begin(ssid, password);     //Connect to your WiFi router
+  Serial.println("");
+
+  Serial.print("Connecting");
+  // Wait for connection
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  //If connection successful show IP address in serial monitor
+  Serial.println("");
+  Serial.print("Connected to ");
+  Serial.println(ssid);
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());  //IP address assigned to your ESP
   
 }
 
@@ -65,7 +85,8 @@ void loop() {
   // readpH();
   readGas();
   readRaindrop();
-  // sendtoDB();
+  sendtoDB();
+  delay(2000);
 }
 void readTurbidity(){
   // Turbidity
@@ -115,7 +136,7 @@ void readRaindrop(){
 void sendtoDB() {
   postVariable = "suhu=";
   //Post Data
-  postData = postVariable + temp + "&ph=" + pHsensor + "&turbidity=" + turbidity + "&raindrop=" + rain + "&gas=" + gas;
+  postData = postVariable + temp + "&ph=" + "7" + "&turbidity=" + turbidity + "&raindrop=" + rain + "&gas=" + gas;
 
   http.begin(client, "http://testmonitoring.cemebsa.com/test/koneksi.php");  //Specify request destination
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");       //Specify content-type header
