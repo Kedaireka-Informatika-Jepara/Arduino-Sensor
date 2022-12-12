@@ -1,7 +1,11 @@
 //Defines which libraries to use
+#include <ESP8266WiFi.h>
+#include <WiFiClient.h> 
+#include <ESP8266WebServer.h>
+#include <ESP8266HTTPClient.h>
 #include <OneWire.h>            //for temp sensor ds18b20
 #include <DallasTemperature.h>  //for temp sensor ds18b20
-#include "DFRobot_PH.h"         //for pH sensor Gravity pH V2
+#include <DFRobot_PH.h>         //for pH sensor Gravity pH V2
 #include <EEPROM.h>             //for pH sensor Gravity pH V2
 #include <MQ135.h>              //for gas sensor MQ135
 
@@ -14,10 +18,25 @@
 #define ANALOG_INPUT A0
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
-
+DFRobot_PH ph;
 //Define the network connection
+/* Set these to your desired credentials. */
+const char *ssid = "Beansinside";
+const char *password = "Shortseal 10";
 
+//Web/Server address to read/write from 
+const char *host = "testmonitoring.cemebsa.com";
+WiFiClient client;
 
+// variabel
+  float temp;
+  float gas;
+  float turbidity;
+  float pHvalue, pHsensor;
+  float rain;
+HTTPClient http;
+  String postData;
+  String postVariable;
 void setup() {
   delay(1000); //wait 1s after power on
 
@@ -26,7 +45,7 @@ void setup() {
   pinMode(MUXB, OUTPUT);
   pinMode(MUXC, OUTPUT);
   pinMode(MUXD, OUTPUT);
-
+  // ph.begin();
   sensors.begin();
   Serial.begin(115200);
   
@@ -40,45 +59,73 @@ void changeMux(int d, int c, int b, int a) {
 }
 
 void loop() {
-
-  float Temp;
-  float Gas;
-  float Turbidity;
-  float pHvalue, pHsensor;
-  float Rain;
   
-  
+  readTemperature();
+  readTurbidity();
+  // readpH();
+  readGas();
+  readRaindrop();
+  // sendtoDB();
+}
+void readTurbidity(){
+  // Turbidity
+  // MUX pin C10 => [1,0,1,0]
+  changeMux(HIGH, LOW, HIGH, LOW);
+  int sensorTurb = analogRead(ANALOG_INPUT);
+  turbidity = sensorTurb * (5.0 / 1024.0); // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V):
+  Serial.print(" Turbidity: ");
+  Serial.print(turbidity);  // print out the value you read:
+}
+void readTemperature(){
   //Temp Sensor
   sensors.requestTemperatures();
-  Temp = sensors.getTempCByIndex(0);
-
+  temp = sensors.getTempCByIndex(0);
+  Serial.print("Temperature: ");
+  Serial.print(temp);
+}
+void readGas(){
   //Multiplexer
   //  Gas
   //  MUX pin on C0 => [0,0,0,0]
   changeMux(LOW, LOW, LOW, LOW);
   MQ135 gasSensor = MQ135(ANALOG_INPUT);
-  Gas = (gasSensor.getPPM())/10000.0; // Get the ppm of CO2 sensed (assuming only CO2 in the air)
-
-  // Turbidity
-  // MUX pin C10 => [1,0,1,0]
-  changeMux(HIGH, LOW, HIGH, LOW);
-  int sensorTurb = analogRead(ANALOG_INPUT);
-  Turbidity = sensorTurb * (5.0 / 1024.0); // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V):
-  
-  // pH
-  // MUX pin on C12 => [1,1,0,0]
-  changeMux(HIGH, HIGH, LOW, LOW);
-  float sensPH, temperature = 25;
-  sensPH = analogRead(ANALOG_INPUT)/1024.0*5000;
-  pHvalue = ph.readPH(voltage,temperature);
-  pHsensor = (phValue,2)
-
-  // Raindrop
+  gas = (gasSensor.getPPM())/10000.0; // Get the ppm of CO2 sensed (assuming only CO2 in the air)
+  Serial.print(" Gas: ");
+  Serial.print(gas);  // print out the value you read:
+}
+// void readpH(){
+//   // pH
+//   // MUX pin on C12 => [1,1,0,0]
+//   changeMux(HIGH, HIGH, LOW, LOW);
+//   float sensPH
+//   sensPH = analogRead(ANALOG_INPUT)/1024.0*5000;
+//   pHvalue = ph.readPH(voltage,temp);
+//   pHsensor = (phValue,2)
+//   Serial.print(" pH: ");
+//   Serial.print(pHsensor);  // print out the value you read:
+// }
+void readRaindrop(){
+// Raindrop
   // MUX pin on C15 => [1,1,1,1]
   changeMux(HIGH, HIGH, HIGH, HIGH);
-  Rain = analogRead(ANALOG_INPUT);
-  
-  
-  
+  rain = analogRead(ANALOG_INPUT);
+  Serial.print(" Raindrop: ");
+  Serial.println(rain);  // print out the value you read:
+}
+void sendtoDB() {
+  postVariable = "suhu=";
+  //Post Data
+  postData = postVariable + temp + "&ph=" + pHsensor + "&turbidity=" + turbidity + "&raindrop=" + rain + "&gas=" + gas;
 
+  http.begin(client, "http://testmonitoring.cemebsa.com/test/koneksi.php");  //Specify request destination
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");       //Specify content-type header
+
+  int httpCode = http.POST(postData);  //Send the request
+  String payload = http.getString();   //Get the response payload
+
+  Serial.println(postData);
+  Serial.println(httpCode);  //Print HTTP return code
+  Serial.println(payload);   //Print request response payload
+
+  http.end();  //Close connection 
 }
