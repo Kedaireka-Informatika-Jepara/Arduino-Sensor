@@ -19,13 +19,14 @@
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 DFRobot_PH ph;
+
 //Define the network connection
 /* Set these to your desired credentials. */
-const char *ssid = "Beansinside";
-const char *password = "Shortseal 10";
+const char *ssid = "Alifio Adel";
+const char *password = "ShortSeal";
 
 //Web/Server address to read/write from 
-const char *host = "testmonitoring.cemebsa.com";
+const char *host = "monitoring.cemebsa.com";
 WiFiClient client;
 
 // variabel
@@ -34,9 +35,10 @@ WiFiClient client;
   float turbidity;
   float pHvalue, pHsensor;
   float rain;
-HTTPClient http;
+  HTTPClient http;
   String postData;
   String postVariable;
+  
 void setup() {
   delay(1000); //wait 1s after power on
 
@@ -138,7 +140,7 @@ void sendtoDB() {
   //Post Data
   postData = postVariable + temp + "&ph=" + "7" + "&turbidity=" + turbidity + "&raindrop=" + rain + "&gas=" + gas;
 
-  http.begin(client, "http://testmonitoring.cemebsa.com/test/koneksi.php");  //Specify request destination
+  http.begin(client, "http://monitoring.cemebsa.com/test/koneksi.php");  //Specify request destination
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");       //Specify content-type header
 
   int httpCode = http.POST(postData);  //Send the request
