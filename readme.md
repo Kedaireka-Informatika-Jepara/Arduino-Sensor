@@ -30,10 +30,11 @@ Untuk melakukan percobaan Sensor pH, silahkan ikuti langkah-langkah berikut:
 11. Lakukan kalibrasi pH dengan menggunakan solusi pH 4 dan pH 7
 12. Pada serial monitor, akan muncul nilai pH yang terbaca setelah dilakukan kalibrasi
 Untuk pin yang digunakan dalam percobaan ini adalah:
-| Sensor pH | ESP32 |
-|-----------|-------|
-| VCC       | 3.3V  |
-| GND       | GND   |
+
+| Sensor pH | ESP32   |
+|-----------|---------|
+| VCC       | 3.3V    |
+| GND       | GND     |
 | A         | GPIO 35 |
 
 Untuk melakukan percobaan Sensor suhu, silahkan ikuti langkah-langkah berikut:
@@ -74,6 +75,7 @@ void loop() {
 4. Buka serial monitor dengan baud rate 115200
 5. Pada serial monitor, akan muncul nilai suhu yang terbaca
 Untuk pin yang digunakan dalam percobaan ini adalah:
+
 | Sensor suhu | ESP32 |
 |-------------|-------|
 | VCC         | 3.3V  |
