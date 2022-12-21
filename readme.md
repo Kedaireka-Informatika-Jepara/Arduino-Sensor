@@ -87,3 +87,90 @@ Untuk pin yang digunakan dalam percobaan ini adalah:
 
 ## Percobaan Sensor Kekeruhan
 Untuk melakukan percobaan Sensor kekeruhan, silahkan ikuti langkah-langkah berikut:
+1. Buka Arduino IDE, dan buatlah file baru
+2. Salin kode berikut:
+```c++
+void setup() {
+  Serial.begin(115200); //Baud rate: 115200
+}
+void loop() {
+  int sensorValue = analogRead(39);// read the input on analog pin 39
+  float turbidity = map(sensorValue, 0, 1400, 5, 1);
+  String text = (String)turbidity;
+  Serial.println(text); // print out the value you read:
+  delay(500);
+}
+```
+3. Pilih menu 'Sketch' -> 'Upload'
+4. Buka serial monitor dengan baud rate 115200
+5. Pada serial monitor, akan muncul nilai kekeruhan yang terbaca
+Untuk pin yang digunakan dalam percobaan ini adalah:
+
+| Sensor kekeruhan | ESP32 |
+|------------------|-------|
+| VCC              | 5V  |
+| GND              | GND   |
+| DATA             | GPIO 39 |
+
+Karena sensor ini menggunakan 5V dan ESP32 hanya dapat memberikan 3.3V, maka digunakan resistor 470 ohm dan 1K ohm untuk mengurangi tegangan menjadi sekitar 3.3V.
+
+## Percobaan Sensor Gas
+Untuk melakukan percobaan Sensor gas, silahkan ikuti langkah-langkah berikut:
+1. Unduh library 'mq135' di laman berikut: https://github.com/GeorgK/MQ135 dan download file zipnya
+2. Buka Arduino IDE, lalu pilih menu 'Sketch' -> 'Include Library' -> 'Add .ZIP Library' dan pilih file zip yang sudah diunduh
+3. Buatlah file baru di Arduino IDE dan salin kode berikut:
+```c++
+#include "MQ135.h"
+#define Gas_PIN 36
+float gas;
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(115200);
+}
+
+void loop() {
+  MQ135 gasSensor = MQ135(analogRead(Gas_PIN););
+  gas = (gasSensor.getPPM())/10000.0; // Get the ppm of CO2 sensed (assuming only CO2 in the air)
+  Serial.print(" Gas: ");
+  Serial.print(gas);  // print out the value you read:
+}
+```
+4. Pilih menu 'Sketch' -> 'Upload'
+5. Buka serial monitor dengan baud rate 115200
+6. Pada serial monitor, akan muncul nilai gas yang terbaca
+Untuk pin yang digunakan dalam percobaan ini adalah:
+
+| Sensor gas | ESP32 |
+|------------|-------|
+| VCC        | 3.3V  |
+| GND        | GND   |
+| DATA       | GPIO 36 |
+
+## Percobaan Sensor Tetesan Hujan
+Untuk melakukan percobaan Sensor tetesan hujan, silahkan ikuti langkah-langkah berikut:
+1. Buka Arduino IDE, dan buatlah file baru
+2. Salin kode berikut:
+```c++
+#define RD_PIN 34
+float rain;
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(115200);
+}
+void loop() {
+  rain = analogRead(RD_PIN);
+  Serial.print(" Rain: ");
+  Serial.print(rain);  // print out the value you read:
+}
+```
+3. Pilih menu 'Sketch' -> 'Upload'
+4. Buka serial monitor dengan baud rate 115200
+5. Pada serial monitor, akan muncul nilai tetesan hujan yang terbaca
+Untuk pin yang digunakan dalam percobaan ini adalah:
+
+| Sensor tetesan hujan | ESP32 |
+|----------------------|-------|
+| VCC                  | 3.3V  |
+| GND                  | GND   |
+| DATA                 | GPIO 34 |
+
