@@ -1,3 +1,5 @@
+# Sensor Monitoring System untuk Keramba Jaring Apung Bulat Bertingkat (KJABB-RNS) menggunakan ESP32
+
 Dalam repo ini, ada beberapa tes kode untuk melakukan percobaan sensor yang digunakan. 
 Sensor yang digunakan adalah
 1. Sensor pH dengan DFRobot Gravity: Analog pH Sensor Kit V2.0
@@ -15,7 +17,7 @@ Untuk menginstall library ESP32, silahkan ikuti langkah-langkah berikut:
 5. Cari 'esp32' dan install library 'esp32 by Espressif Systems'
 6. Pilih menu 'Tools' -> 'Board' -> 'ESP32 Dev Module'
 
-
+## Percobaan Sensor pH
 Untuk melakukan percobaan Sensor pH, silahkan ikuti langkah-langkah berikut:
 1. Download library 'DFRobot_PH' di laman berikut: https://github.com/greenponik/DFRobot_ESP_PH_BY_GREENPONIK dan download file zipnya
 2. Buka Arduino IDE
@@ -37,6 +39,7 @@ Untuk pin yang digunakan dalam percobaan ini adalah:
 | GND       | GND     |
 | A         | GPIO 35 |
 
+## Percobaan Sensor Suhu
 Untuk melakukan percobaan Sensor suhu, silahkan ikuti langkah-langkah berikut:
 1. Install library OneWire library by Paul Stoffregen dan DallasTemperature library by Miles Burton di Arduino IDE
 2. Buatlah file baru di Arduino IDE dan salin kode berikut:
@@ -82,3 +85,5 @@ Untuk pin yang digunakan dalam percobaan ini adalah:
 | GND         | GND   |
 | DATA        | GPIO 4 |
 
+## Percobaan Sensor Kekeruhan
+Untuk melakukan percobaan Sensor kekeruhan, silahkan ikuti langkah-langkah berikut:
