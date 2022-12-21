@@ -105,7 +105,7 @@ void readpH() {
 void sendtoDB() {
   postVariable = "suhu=";
   //Post Data
-  postData = postVariable + temp + "&ph=" + "7" + "&turbidity=" + turbidity + "&raindrop=" + rain + "&gas=" + gas;
+  postData = postVariable + temp + "&ph=" + phValue + "&turbidity=" + turbidity + "&raindrop=" + rain + "&gas=" + gas;
 
   http.begin(client, "http://monitoring.cemebsa.com/test/koneksi.php");  //Specify request destination
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");       //Specify content-type header
