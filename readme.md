@@ -83,7 +83,7 @@ Untuk pin yang digunakan dalam percobaan ini adalah:
 |-------------|-------|
 | VCC         | 3.3V  |
 | GND         | GND   |
-| DATA        | GPIO 4 |
+| DATA        | GPIO 4 + 4,7K Ohm + VCC |
 
 ## Percobaan Sensor Kekeruhan
 Untuk melakukan percobaan Sensor kekeruhan, silahkan ikuti langkah-langkah berikut:
