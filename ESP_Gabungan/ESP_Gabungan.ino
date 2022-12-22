@@ -32,7 +32,7 @@ WiFiClient client;
 // variable
 float temp;
 float gas;
-float turbidity;
+float turbidity, turbi;
 float pHvalue, pHsensor;
 float rain;
 HTTPClient http;
@@ -65,28 +65,28 @@ void readTemperature() {
   //Temp Sensor
   sensors.requestTemperatures();
   temp = sensors.getTempCByIndex(0);
-  Serial.print("Temperature:");
-  Serial.println(temp);
+//  Serial.print("Temperature:");
+//  Serial.println(temp);
 }
 
 void readRaindrop() {
   rain = analogRead(RD_PIN);
-  Serial.print("Raindrop:");
-  Serial.println(rain);  // print out the value you read:   
+//  Serial.print("Raindrop:");
+//  Serial.println(rain);  // print out the value you read:   
 }
 
 void readGas() {
   MQ135 gasSensor = MQ135(analogRead(Gas_PIN));
   gas = (gasSensor.getPPM())/10000.0; // Get the ppm of CO2 sensed (assuming only CO2 in the air)
-  Serial.print("Gas:");
-  Serial.println(gas);  // print out the value you read:
+//  Serial.print("Gas:");
+//  Serial.println(gas);  // print out the value you read:
 }
 
 void readTurbidity() {
   int sensorValue = analogRead(Turb_PIN);// read the input on analog pin 39:
-  float turbidity = map(sensorValue, 0, 1400, 5, 1);
+  turbi = map(sensorValue, 0, 1400, 5, 1);
   Serial.print("Turbidity:");
-  Serial.println(turbidity);  // print out the value you read:
+  Serial.println(turbi);  // print out the value you read:
 }
 
 void readpH() {
@@ -97,15 +97,16 @@ void readpH() {
     //voltage = rawPinValue / esp32ADC * esp32Vin
     voltage = analogRead(PH_PIN) / ESPADC * ESPVOLTAGE; // read the voltage
     phValue = ph.readPH(voltage, temp); // convert voltage to pH with temperature compensation
-    Serial.print("pH:");
-    Serial.println(phValue, 4);
+//    Serial.print("pH:");
+//    Serial.println(phValue, 4);
   }
 }
 
 void sendtoDB() {
+  turbidity = turbi;
   postVariable = "suhu=";
   //Post Data
-  postData = postVariable + temp + "&ph=" + phValue + "&turbidity=" + turbidity + "&raindrop=" + rain + "&gas=" + gas;
+  postData = postVariable + temp + " &ph=" + phValue + " &turbidity=" + turbidity + " &raindrop=" + rain + " &gas=" + gas;
 
   http.begin(client, "http://monitoring.cemebsa.com/test/koneksi.php");  //Specify request destination
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");       //Specify content-type header
@@ -126,6 +127,6 @@ void loop() {
   readpH();
   readGas();
   readRaindrop();
-  //sendtoDB();
+  sendtoDB();
   delay(1000);
 }
