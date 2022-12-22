@@ -22,8 +22,8 @@ OneWire oneWire(oneWireBus);
 DallasTemperature sensors(&oneWire);
 
 // Replace with your network credentials
-const char* ssid = "Alifio Adel";
-const char* password = "ShortSeal";
+const char* ssid = "Beansinside";
+const char* password = "Shortseal 10";
 
 //Web/Server address to read/write from 
 const char *host = "monitoring.cemebsa.com";
@@ -53,7 +53,7 @@ void setup() {
   Serial.println("");
   Serial.print("Connected to ");
   Serial.println(ssid);
-  Serial.println("IP address: ");
+  Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
   EEPROM.begin(32);//needed to permit storage of calibration value in eeprom
   ph.begin();
@@ -65,28 +65,28 @@ void readTemperature() {
   //Temp Sensor
   sensors.requestTemperatures();
   temp = sensors.getTempCByIndex(0);
-  Serial.print("Temperature: ");
-  Serial.print(temp);
+  Serial.print("Temperature:");
+  Serial.println(temp);
 }
 
 void readRaindrop() {
   rain = analogRead(RD_PIN);
-  Serial.print(" Raindrop: ");
+  Serial.print("Raindrop:");
   Serial.println(rain);  // print out the value you read:   
 }
 
 void readGas() {
-  MQ135 gasSensor = MQ135(analogRead(Gas_PIN););
+  MQ135 gasSensor = MQ135(analogRead(Gas_PIN));
   gas = (gasSensor.getPPM())/10000.0; // Get the ppm of CO2 sensed (assuming only CO2 in the air)
-  Serial.print(" Gas: ");
-  Serial.print(gas);  // print out the value you read:
+  Serial.print("Gas:");
+  Serial.println(gas);  // print out the value you read:
 }
 
 void readTurbidity() {
   int sensorValue = analogRead(Turb_PIN);// read the input on analog pin 39:
   float turbidity = map(sensorValue, 0, 1400, 5, 1);
-  Serial.print(" Turbidity: ");
-  Serial.print(turbidity);  // print out the value you read:
+  Serial.print("Turbidity:");
+  Serial.println(turbidity);  // print out the value you read:
 }
 
 void readpH() {
@@ -96,7 +96,7 @@ void readpH() {
     timepoint = millis();
     //voltage = rawPinValue / esp32ADC * esp32Vin
     voltage = analogRead(PH_PIN) / ESPADC * ESPVOLTAGE; // read the voltage
-    phValue = ph.readPH(voltage, temperature); // convert voltage to pH with temperature compensation
+    phValue = ph.readPH(voltage, temp); // convert voltage to pH with temperature compensation
     Serial.print("pH:");
     Serial.println(phValue, 4);
   }
@@ -126,6 +126,6 @@ void loop() {
   readpH();
   readGas();
   readRaindrop();
-  sendtoDB();
+  //sendtoDB();
   delay(1000);
 }
