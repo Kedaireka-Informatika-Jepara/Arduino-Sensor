@@ -142,9 +142,11 @@ Untuk pin yang digunakan dalam percobaan ini adalah:
 
 | Sensor gas | ESP32 |
 |------------|-------|
-| VCC        | 3.3V  |
+| VCC        | 5V  |
 | GND        | GND   |
 | DATA       | GPIO 36 |
+
+Karena sensor ini menggunakan 5V dan ESP32 hanya dapat memberikan 3.3V, maka digunakan resistor 470 ohm dan 1K ohm untuk mengurangi tegangan menjadi sekitar 3.3V.
 
 ## Percobaan Sensor Tetesan Hujan
 Untuk melakukan percobaan Sensor tetesan hujan, silahkan ikuti langkah-langkah berikut:
