@@ -133,17 +133,17 @@ void sendtoDB() {
   //Post Data
   postData = postVariable + temp + " &ph= " + phValue + " &turbidity= " + turbidity + " &raindrop= " + rain + " &gas= " + gas + " &TDS= " + tdsValue;
 
-//  http.begin(client, "http://monitoring.cemebsa.com/test/koneksi.php");  //Specify request destination
-//  http.addHeader("Content-Type", "application/x-www-form-urlencoded");       //Specify content-type header
-//
-//  int httpCode = http.POST(postData);  //Send the request
-//  String payload = http.getString();   //Get the response payload
+  http.begin(client, "http://monitoring.cemebsa.com/api/datasensor");  //Specify request destination
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");       //Specify content-type header
+
+  int httpCode = http.POST(postData);  //Send the request
+  String payload = http.getString();   //Get the response payload
 
   Serial.println(postData);
-//  Serial.println(httpCode);  //Print HTTP return code
-//  Serial.println(payload);   //Print request response payload
+  Serial.println(httpCode);  //Print HTTP return code
+  Serial.println(payload);   //Print request response payload
 
-//  http.end();  //Close connection
+  http.end();  //Close connection
 }
 
 void loop() {
