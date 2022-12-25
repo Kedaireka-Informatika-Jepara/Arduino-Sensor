@@ -12,7 +12,7 @@
 //Defined pin and state to be used 
 DFRobot_ESP_PH ph;
 GravityTDS gravityTds;
-#define ESPADC 4096.0       //the esp Analog Digital Convertion value
+#define ESPADC 4096.0       //the esp Analog Digital Convertion value;1024 for 10bit ADC;4096 for 12bit ADC
 #define VREF 3300     //the esp voltage supply value
 #define PH_PIN 35           //the esp gpio data pin number for pH
 #define Gas_PIN 32          //the esp gpio data pin number for Gas
@@ -25,8 +25,8 @@ OneWire oneWire(oneWireBus);
 DallasTemperature sensors(&oneWire);
 
 // Replace with your network credentials
-const char* ssid = "Beansinside";
-const char* password = "Shortseal 10";
+const char* ssid = "Adel";
+const char* password = "Suhardi10";
 
 //Web/Server address to read/write from 
 const char *host = "monitoring.cemebsa.com";
@@ -45,6 +45,7 @@ String postVariable;
 
 void setup() {
   Serial.begin(115200);
+  delay(100);
   pinMode(PH_PIN, INPUT);
   pinMode(Gas_PIN, INPUT);
   pinMode(RD_PIN, INPUT);
@@ -52,7 +53,7 @@ void setup() {
   pinMode(TdsSensorPin, INPUT);
   gravityTds.setPin(TdsSensorPin);
   gravityTds.setAref(3.3);  //reference voltage on ADC, default 5.0V on Arduino UNO
-  gravityTds.setAdcRange(ESPADC);  //1024 for 10bit ADC;4096 for 12bit ADC
+  gravityTds.setAdcRange(ESPADC);  
   Serial.print("Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
@@ -107,7 +108,7 @@ void readTurbidity() {
 
 void readpH() {
   static unsigned long timepoint = millis();
-  if (millis() - timepoint > 1000U) //time interval: 1s
+  if (millis() - timepoint > 60000U) //time interval: 1min
   {
     timepoint = millis();
     //voltage = rawPinValue / esp32ADC * esp32Vin
@@ -133,7 +134,7 @@ void sendtoDB() {
   //Post Data
   postData = postVariable + temp + " &ph= " + phValue + " &turbidity= " + turbidity + " &raindrop= " + rain + " &gas= " + gas + " &TDS= " + tdsValue;
 
-  http.begin(client, "http://monitoring.cemebsa.com/api/datasensor");  //Specify request destination
+  http.begin(client, "http://monitoring.cemebsa.com/api/DataSensor");  //Specify request destination
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");       //Specify content-type header
 
   int httpCode = http.POST(postData);  //Send the request
@@ -141,7 +142,7 @@ void sendtoDB() {
 
   Serial.println(postData);
   Serial.println(httpCode);  //Print HTTP return code
-  Serial.println(payload);   //Print request response payload
+  //Serial.println(payload);   //Print request response payload
 
   http.end();  //Close connection
 }
@@ -154,5 +155,5 @@ void loop() {
   readRaindrop();
   readTDS();
   sendtoDB();
-  delay(600000);
+  delay(300000);
 }
