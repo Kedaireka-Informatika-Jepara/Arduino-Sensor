@@ -154,5 +154,5 @@ void loop() {
   readRaindrop();
   readTDS();
   sendtoDB();
-  delay(1000);
+  delay(600000);
 }
