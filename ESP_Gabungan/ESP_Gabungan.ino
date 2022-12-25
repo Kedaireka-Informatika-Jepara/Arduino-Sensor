@@ -130,9 +130,9 @@ void readTDS() {
 
 void sendtoDB() {
   turbidity = turbi;
-  postVariable = "suhu= ";
+  postVariable = "suhu=";
   //Post Data
-  postData = postVariable + temp + " &ph= " + phValue + " &turbidity= " + turbidity + " &raindrop= " + rain + " &gas= " + gas + " &TDS= " + tdsValue;
+  postData = postVariable + temp + "&ph=" + phValue + "&turbidity=" + turbidity + "&raindrop=" + rain + "&gas=" + gas + "&tds=" + tdsValue;
 
   http.begin(client, "http://monitoring.cemebsa.com/api/DataSensor");  //Specify request destination
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");       //Specify content-type header
