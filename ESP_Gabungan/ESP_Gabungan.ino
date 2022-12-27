@@ -25,8 +25,8 @@ OneWire oneWire(oneWireBus);
 DallasTemperature sensors(&oneWire);
 
 // Replace with your network credentials
-const char* ssid = "Adel";
-const char* password = "Suhardi10";
+const char* ssid = "Alifio Adel";
+const char* password = "ShortSeal";
 
 //Web/Server address to read/write from 
 const char *host = "monitoring.cemebsa.com";
@@ -85,14 +85,14 @@ void readTemperature() {
 }
 
 void readRaindrop() {
-  rain = analogRead(RD_PIN);
+  rain = digitalRead(RD_PIN);
 //  Serial.print("Raindrop:");
 //  Serial.println(rain);  // print out the value you read:   
 }
 
 void readGas() {
-  MQ135 gasSensor = MQ135(analogRead(Gas_PIN));
-  gas = (gasSensor.getPPM())/10000.0; // Get the ppm of CO2 sensed (assuming only CO2 in the air)
+  float gasSensor = analogRead(Gas_PIN);
+  gas = gasSensor; // Get the ppm of CO2 sensed (assuming only CO2 in the air)
 //  Serial.print("Gas:");
 //  Serial.print(gas);  // print out the value you read:
 //  Serial.println("ppm");
@@ -155,5 +155,5 @@ void loop() {
   readRaindrop();
   readTDS();
   sendtoDB();
-  delay(300000);
+  delay(30000);
 }
