@@ -108,7 +108,7 @@ void readTurbidity() {
 
 void readpH() {
   static unsigned long timepoint = millis();
-  if (millis() - timepoint > 60000U) //time interval: 1min
+  if (millis() - timepoint > 30000U) //time interval: 30s
   {
     timepoint = millis();
     //voltage = rawPinValue / esp32ADC * esp32Vin
